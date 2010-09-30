@@ -1,0 +1,2 @@
+useDynLib(iSeq)
+export(iSeq1,iSeq2,peakreg,mergetag,plotreg)
