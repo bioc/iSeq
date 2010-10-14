@@ -35,7 +35,7 @@ Memorial Sloan-Kettering Cancer Center\\
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Introduction}
 
-This package implements the models proposed by Mo (2010c) for ChIP-seq data analysis, 
+This package implements the models proposed by Mo (2010) for ChIP-seq data analysis, 
 which are the extensions of the models proposed for ChIP-chip data (Mo and Liang, 2010a,b).  
 The package can be used to analyze the ChIP-seq data with or without controls. \\
 
@@ -54,12 +54,12 @@ In the first stage, conditioning on the latent variable $X_i$, the bin-based tag
 Poisson-Gamma distributions.  If $X_i=-1$, the tag count for bin $i$ is assumed to follow a Poisson distribution 
 with parameter $\lambda_0$, where $\lambda_0 \sim \textrm{Gamma}(a_0,b_0)$. If $X_i= 1$,  the tag count for 
 bin $i$ is assumed to follow a Poisson distribution with parameter $\lambda_1$, 
-where $\lambda_1 \sim \textrm{Gamma}(a_1,b_1)$. $\textrm{Gamma}(a,b)$ denote a gamma distribution with mean 
+where $\lambda_1 \sim \textrm{Gamma}(a_1,b_1)$. $\textrm{Gamma}(a,b)$ denotes a gamma distribution with mean 
 $a/b$ and variance $a/b^2$.  In the second stage, the latent variable is modeled by ferromagnetic Ising models.
 The Gibbs sampler and Metropolis algorithm are used to simulate from the posterior distributions of the model parameters.}
 \item {Call enriched regions.  The posterior probabilities for the bins in the enriched state ($X_i = 1$) are used 
 for statistical inference.  A bin with a high posterior probability in the enriched state will provide strong evidence 
-that the bin is an enriched bin. Enriched bins are then merged into enriched regions.}  
+that the bin is enriched. Enriched bins are then merged into enriched regions.}  
 \end{itemize}
 
 \noindent
@@ -108,7 +108,7 @@ print(tagct[1:3,])
 See the help file for function 'mergetag' for the meanings of the tagct columns. 
  
 \noindent
-The user can quickly get the 'enriched' region without calculating
+The user can quickly get the 'enriched' regions without calculating
 statistical confidence using function 'peakreg'.  For example, if we claim that a bin with adjusted tag count $>$ 10 is 
 an enriched bin,  the 'enriched' regions can be obtained by using the following code.  Let's use the chromosome 22 data as
 an example.  
@@ -132,7 +132,7 @@ res1 = iSeq1(Y=tagct22[,1:4],gap=300,burnin=200,sampling=1000,ctcut=3,a0=1,b0=1,
 @ 
 
 \noindent 
-Plot the model parameters to see whether they converge.  In general, the model has converged when the parameters 
+Plot the model parameters to see whether they converge.  In general, the MCMC chains have converged when the parameters 
 fluctuate around the modes of their distributions.  If there is an obvious trend(e.g. continuous increase or decrease), 
 the user should increase the number of iterations in the burn-in and/or sampling phases. 
 If the chains do not mix well, the user can adjust the argument normsd to see how it affects the results. 
@@ -216,7 +216,7 @@ res2 = iSeq2(Y=tagct22[,1:4],gap=300, burnin=100,sampling=500,winsize=2,ctcut=5,
 @ 
 
 \noindent 
-Plot the model parameters to see whether they converge.  If the chains do not mix well, one can try to adjust 
+Plot the model parameters to see whether they converge.  If the chains do not mix well, one can adjust 
 the parameter {\bf k} and/or normsd to see how it affects the results. 
 \begin{center}
 <<fig=TRUE,echo=TRUE>>=
@@ -304,7 +304,7 @@ res=sfLapply(dataList,iSeq1,gap=300,burnin=100,sampling=200,ctcut=3,a0=1,b0=1,a1
 
 \section{Citing iSeq}
 \noindent
-If you use iSeq package, please cite ``Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis (Submitted).''
+The iSeq1 method is described in ``Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis (Submitted).''.  The other functions are described in ``Mo, Q. (2010).  iSeq - A flexible and powerful R/Bioconductor package for analyzing ChIP-seq data (Submitted).``
 
 <<echo=TRUE,print=TRUE>>=
 sessionInfo()
@@ -322,7 +322,10 @@ A hidden Ising model for ChIP-chip data analysis.
 {\it Bioinformatics} {\bf 26(6)}, 777-783. doi:10.1093/bioinformatics/btq032
 
 \bibitem[\protect\citeauthoryear{Mo}{2010}]{mo2010c}
-Mo, Q. (2010c). A fully Bayesian hidden Ising model for ChIP-seq data analysis. (Submitted)
+Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis. (Submitted). 
+
+\bibitem[\protect\citeauthoryear{Mo}{2010}]{mo2010d}
+Mo, Q. (2010). iSeq - A flexible and powerful R/Bioconductor package for analyzing ChIP-seq data.(Submitted).
 
 \bibitem[\protect\citeauthoryear{Newton et al.}{2004}]{new04}
 Newton, M., Noueiry, A., Sarkar, D., Ahlquist, P. (2004). Detecting differential gene expression with a semiparametric
