@@ -304,7 +304,7 @@ res=sfLapply(dataList,iSeq1,gap=300,burnin=100,sampling=200,ctcut=3,a0=1,b0=1,a1
 
 \section{Citing iSeq}
 \noindent
-The iSeq1 method is described in ``Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis (Submitted).''.  The other functions are described in ``Mo, Q. (2010).  iSeq - A flexible and powerful R/Bioconductor package for analyzing ChIP-seq data (Submitted).``
+If you use iSeq package, please cite ``Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis (Submitted).''. 
 
 <<echo=TRUE,print=TRUE>>=
 sessionInfo()
@@ -323,9 +323,6 @@ A hidden Ising model for ChIP-chip data analysis.
 
 \bibitem[\protect\citeauthoryear{Mo}{2010}]{mo2010c}
 Mo, Q. (2010). A fully Bayesian hidden Ising model for ChIP-seq data analysis. (Submitted). 
-
-\bibitem[\protect\citeauthoryear{Mo}{2010}]{mo2010d}
-Mo, Q. (2010). iSeq - A flexible and powerful R/Bioconductor package for analyzing ChIP-seq data.(Submitted).
 
 \bibitem[\protect\citeauthoryear{Newton et al.}{2004}]{new04}
 Newton, M., Noueiry, A., Sarkar, D., Ahlquist, P. (2004). Detecting differential gene expression with a semiparametric
