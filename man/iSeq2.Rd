@@ -6,7 +6,7 @@
   and the hidden states of the bins using a hidden high-order Ising model. 
 }
 \usage{
-iSeq2(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,
+iSeq2(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=0.95,
       a0=1,b0=1,a1=5,b1=1,k=3,verbose=FALSE)
 }
 \arguments{
@@ -22,7 +22,7 @@ iSeq2(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,
     the start position, and then by the end position.}
   \item{gap}{gap is the average length of the sequenced DNA fragments.  If the
     distance between two nearest bins is greater than 'gap', a bin with
-    0 tag count is insterted into the two neighboring bins for modeling.}
+    0 tag count is inserted into the two neighboring bins for modeling.}
   \item{burnin}{The number of MCMC burn-in iterations.}
   \item{sampling}{The number of MCMC sampling iterations.  The
     posterior probability of enriched and non-enriched state is calculated
@@ -33,8 +33,11 @@ iSeq2(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,
     balance between high sensitivity and low FDR could be achieved by
     setting winsize = 2.}
   \item{ctcut}{A value used to set the initial state for each
-    genomic bin. If tag count of a bin is greater than ctcut, its state
-    will be set to 1, otherwise -1. }
+    genomic bin. If tag count of a bin is greater than
+    quantile(Y[,4],probs=ctcut), its state
+    will be set to 1, otherwise -1.  For typical ChIP-seq data, because
+    the major regions are non-enriched, a good value for ctcut could be
+    in the interval (0.9, 0.99).}
   \item{a0}{The scale hyper-parameter of the Gamma prior, alpha0.}
   \item{b0}{The rate hyper-parameter of the Gamma prior, beta0.}
   \item{a1}{The scale hyper-parameter of the Gamma prior, alpha1.}
@@ -61,9 +64,9 @@ iSeq2(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,
 data(nrsf)
 chip = rbind(nrsf$chipFC1592,nrsf$chipFC1862,nrsf$chipFC2002)
 mock = rbind(nrsf$mockFC1592,nrsf$mockFC1862,nrsf$mockFC2002)
-tagct = mergetag(chip=chip,control=mock,winsize=50)
+tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=10)
 tagct22 = tagct[tagct[,1]=="chr22",]
-res2 = iSeq2(Y=tagct22[,1:4],gap=300, burnin=100,sampling=500,winsize=2,ctcut=5,
+res2 = iSeq2(Y=tagct22[,1:4],gap=200, burnin=100,sampling=500,winsize=2,ctcut=0.95,
   a0=1,b0=1,a1=5,b1=1,k=1.0,verbose=FALSE)
 
 }
@@ -72,8 +75,7 @@ res2 = iSeq2(Y=tagct22[,1:4],gap=300, burnin=100,sampling=500,winsize=2,ctcut=5,
 
 \references{
   Qianxing Mo, Faming Liang.  (2010). Bayesian modeling of ChIP-chip data through
-  a high-order Ising model. \emph{Biometrics}, 2010 Jan 29 [Epub ahead
-  of print]. DOI: 10.1111/j.1541-0420.2009.01379.x
+  a high-order Ising model. \emph{Biometrics}, 66(4), 1284-94.
 
   Qianxing Mo (2010). A fully Bayesian hidden Ising model for ChIP-seq
   data analysis. (submitted).

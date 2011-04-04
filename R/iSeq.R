@@ -6,7 +6,7 @@
 # high-order Ising model for ChIP-chip data
 ## Y[,1] = chromosome,Y[,2]=start position of the bin, Y[,3]=end position of the bin,
 #Y[,4] = counts or adjusted counts
-iSeq2 = function(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,a0=1,b0=1,a1=5,b1=1,k=3,verbose=FALSE){
+iSeq2 = function(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=0.95,a0=1,b0=1,a1=5,b1=1,k=3,verbose=FALSE){
 
   if(missing(Y)){
     stop("Argument Y is missing!\n")
@@ -18,8 +18,13 @@ iSeq2 = function(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,a0=1,b0=1,
   if(winsize < 1){
     stop("winsize must be >= 1\n")
   }
-  if(ctcut < 2){
-    warning("ctcut may be too small")
+
+  if((ctcut < 0.5) || (ctcut > 1)){
+    stop("Error: ctcut outside (0.5, 1)\n")
+  }
+  
+  if(ctcut < 0.9){
+    warning("Warning: ctcut outside [0.9, 0.99)\n")
   }
   if(k < 0){
     stop("kappa must be greater than 0! \n")
@@ -46,7 +51,7 @@ iSeq2 = function(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,a0=1,b0=1,
   a1 = as.double(a1)
   b1 = as.double(b1) 
   X = as.integer(rep(0,rowdim))
-  ctCut = as.integer(ctcut)
+  ctCut = as.integer(quantile(Y[,4],probs=ctcut))
   kp = as.double(k)
   lambda0 = as.double(rep(0,(burnin+sampling)))
   lambda1 = lambda0
@@ -60,7 +65,7 @@ iSeq2 = function(Y,gap=300,burnin=500,sampling=2000,winsize=2,ctcut=5,a0=1,b0=1,
 
 
 ## standard one-dimensional Ising model for ChIP-chip data 
-iSeq1 = function(Y,gap=300,burnin=500,sampling=2000,ctcut=5,a0=1,b0=1,a1=5,b1=1,
+iSeq1 = function(Y,gap=300,burnin=500,sampling=2000,ctcut=0.95,a0=1,b0=1,a1=5,b1=1,
   k0=3,mink=0,maxk=10,normsd=0.1,verbose=FALSE){
 
   if(missing(Y)){
@@ -79,9 +84,14 @@ iSeq1 = function(Y,gap=300,burnin=500,sampling=2000,ctcut=5,a0=1,b0=1,a1=5,b1=1,
   if(mink >= maxk){
     stop("mink must be less than maxk! \n")
   }
-  if(ctcut < 2){
-    warning("ctcut may be too small. \n")
+  if((ctcut < 0.5) || (ctcut > 1)){
+    stop("Error: ctcut outside (0.5, 1)\n")
   }
+  
+  if(ctcut < 0.9){
+    warning("Warning: ctcut outside [0.9, 0.99)\n")
+  }
+  
   if(normsd < 0){
     stop("normsd must be greater than 0. \n")
   }
@@ -100,7 +110,7 @@ iSeq1 = function(Y,gap=300,burnin=500,sampling=2000,ctcut=5,a0=1,b0=1,a1=5,b1=1,
   Size = as.integer(sampling)
   rowdim = as.integer(length(count))
   idata = as.integer(count)
-  ctCut = as.integer(ctcut)
+  ctCut = as.integer(quantile(Y[,4],probs=ctcut))
   a0 = as.double(a0)
   b0 = as.double(b0)
   a1 = as.double(a1)
@@ -175,8 +185,8 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   xlen = nrow(x) #length
   ######### chrom start end countF coutR row.s row.e #############
   if(xlen == 1){
-    br = cbind(x[,1:3],x[,6],x[,6],floor((x[,2]+x[,3])/2),0,round(pp[id],2),count[id,],sum(count[id,]))
-    colnames(br) = c("chr","gstart","gend","rstart","rend","peakpos","cp","meanpp","ct1","ct2","ct12")
+    br = cbind(x[,1:3],x[,6],x[,6],floor((x[,2]+x[,3])/2),round(pp[id],2),count[id,],sum(count[id,]),round(min(count[id,])/sum(count[id,]),2))
+    colnames(br) = c("chr","gstart","gend","rstart","rend","peakpos","meanpp","ct1","ct2","ct12","sym")
     br = as.data.frame(br)
     br[1,1] = chrpos[br[1,4],1] #use the original chromosome label
     return(br)
@@ -186,8 +196,8 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
     as.integer(x[,6]),as.integer(xlen),as.integer(maxgap),ochr=zero,ogstart=zero,ogend=zero,orstart=zero,
     orend=zero,opeak=zero,obimode=zero,nregion=as.integer(0),PACKAGE="iSeq")
 
-  y = cbind(chr=res$ochr,gstart=res$ogstart,gend=res$ogend,rstart=res$orstart,rend=res$orend,
-    peakpos=res$opeak,cp=res$obimode)
+  y = cbind(chr=res$ochr,gstart=res$ogstart,gend=res$ogend,rstart=res$orstart,rend=res$orend,peakpos=res$opeak)
+                                        #cp=res$obimode)
   y = y[1:res$nregion,]
   
   if(res$nregion==1){
@@ -206,9 +216,10 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   countF = apply(y,1,countFun,ct=count[,1])
   countR = apply(y,1,countFun,ct=count[,2])
   countFR = countF + countR
+  symtry = round(pmin(countF,countR)/countFR,2)
 #  regsize = y[,3]-y[,2]+1
 #  br = data.frame(y,meanpp=mpp,countF=countF,countR=countR,countFR=countFR,regsize=regsize)
-  br = data.frame(y,meanpp=mpp,ct1=countF,ct2=countR,ct12=countFR)
+  br = data.frame(y,meanpp=mpp,ct1=countF,ct2=countR,ct12=countFR,sym=symtry)
   br[,1] = chrpos[br[,4],1] #use the original chromosome label
   return(br)
 }
@@ -228,42 +239,41 @@ dirFDR <- function(pp, fdrcut){
 
 ### function used for iSeq package ####
 ### IP[,1] - chromosome, IP[,2]: genomic position, IP[,3], chain indicator 
-mergetag = function(chip,control,winsize=50){
-
+mergetag = function(chip,control,maxlen=80,minlen=10,ntagcut=10){
   if(missing(chip)){stop("Argument chip is missing")}
   
   Y = NULL
-  message("- Sort the data -\n")
+  message("- Sort the data -")
   IP = chip[order(chip[,1],as.numeric(chip[,2])),]
 
-  message("- Merge the ChIP sequence tags - \n")
+  message("- Merge the ChIP sequence tags - ")
   xrow = nrow(IP)
   chr = as.integer(rep(0,xrow))  #a vector of 0 for initialization
   chrinput = as.numeric(as.factor(IP[,1])) #actual chromosome
   chain = as.numeric(as.factor(IP[,3])) 
   res = .C("binning",as.integer(chrinput),as.integer(IP[,2]),as.integer(chain),as.integer(xrow),
-    as.integer(winsize),chro=chr,gstart=chr,gend=chr,count1=chr,count2=chr,chroID=chr,
-    nregion=as.integer(0),PACKAGE="iSeq")
+    as.integer(maxlen),as.integer(minlen),as.integer(ntagcut),chro=chr,gstart=chr,gend=chr,gend2=chr,
+    count1=chr,count2=chr,chroID=chr,nregion=as.integer(0),PACKAGE="iSeq")
   Y = data.frame(gstart=res$gstart,gend=res$gend,ct12=(res$count1+res$count2),
-    ct1=res$count1,ct2=res$count2)[1:res$nregion,]
+    ct1=res$count1,ct2=res$count2,gend2=res$gend2)[1:res$nregion,]
   Y = data.frame(chr=IP[res$chroID[1:res$nregion],1],Y)
 
   if(!(missing(control))){
-    message("- Background substraction - \n")
+    message("- Background substraction - ")
     CON = control[order(control[,1],as.numeric(control[,2])),]
     IPchr = as.factor(Y[,1])
     CONchr = as.factor(CON[,1])
     CONchain = as.numeric(as.factor(CON[,3]))
     if(length(attributes(IPchr)$levels) != length(attributes(CONchr)$levels)){
-      message("Error: Y[,1] and CON[,1] have different numbers/types of chromosomes!\n")
+      message("Error: chip[,1] and control[,1] have different numbers/types of chromosomes!\n")
       stop("The numbers/types of chromosomes in chip and control must be the same.\n")
     }
     IPchr = as.integer(as.numeric(IPchr))
     CONchr = as.integer(as.numeric(CONchr))
     IProw = nrow(Y)
     CONrow = nrow(CON)
-    res2 = .C("subBkg",IPchr,as.integer(Y[,2]),IPend=as.integer(Y[,3]),
-      as.integer(IProw),as.integer(winsize),CONchr,as.integer(CON[,2]),as.integer(CONchain),
+    res2 = .C("subBkg",IPchr,as.integer(Y[,2]),IPend=as.integer(Y[,3]),as.integer(Y$gend2),as.integer(Y[,5]),
+      as.integer(IProw),as.integer(maxlen),as.integer(ntagcut),CONchr,as.integer(CON[,2]),as.integer(CONchain),
       as.integer(CONrow),countIP=as.integer(Y[,4]),countFCON=as.integer(rep(0,IProw)),
       countRCON=as.integer(rep(0,IProw)),PACKAGE="iSeq")
     Y = data.frame(chr=Y[,1],gstart=Y[,2],gend=res2$IPend,adjct=res2$countIP,ipct1=Y[,5],ipct2=Y[,6],
@@ -309,8 +319,6 @@ plotreg = function(gpos,ipct,conct,peak,col=c("yellow","green","grey0","blue")){
   abline(h=0,lwd=2)
 }
 
-
-#dyn.unload("/home/nfs/moq/Ising/binning.so")
 ## binobj is the object returned by binning function
 # control[,1] -- chromosome, control[,2] - genomic position, control[,3] chain indicator
 # control must be sorted, firstly by chromosome and then by genomic position
@@ -327,7 +335,7 @@ subcon = function(binobj,control){
   IProw = nrow(binobj$reg)
   CONrow = nrow(control)
   res = .C("subBkg",IPchr,as.integer(binobj$reg[,2]),IPend=as.integer(binobj$reg[,3]),
-    as.integer(IProw),as.integer(binobj$winsize),CONchr,as.integer(control[,2]),as.integer(CONchain),
+    as.integer(IProw),as.integer(binobj$maxlen),CONchr,as.integer(control[,2]),as.integer(CONchain),
     as.integer(CONrow),countIP=as.integer(binobj$reg[,4]+binobj$reg[,5]),countFCON=as.integer(rep(0,IProw)),
     countRCON=as.integer(rep(0,IProw)),PACKAGE="iSeq")
   data.frame(chr=binobj$reg[,1],gstart=binobj$reg[,2],gend=res$IPend,adjct=res$countIP,

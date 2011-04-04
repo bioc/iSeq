@@ -189,7 +189,7 @@ void iSeq2(int *burning,int *size,int *nrow,int *mydt,int *halfwin,int *countCut
   /*  Rprintf("n0 = %d, n1 = %d \n",n0,n1); */
 
   if((n0 < 1) || (n1 < 1)){
-    Rprintf("Warning: all probes are in the same state at the last MCMC iteration.\n NO enriched region is found!\n");
+    Rprintf("Warning: all bins are in the same state at the last MCMC iteration.\n NO enriched region is found!\n");
   }
 
   for(i=0; i<(*nrow); i++){
@@ -397,7 +397,7 @@ void iSeq1(int *burning,int *Size,int *nrow,int *dt,int *countCutoff,double *kap
   }
 
   if((n0 < 1) || (n1 < 1)){
-    Rprintf("Warning: all probes are in the same state at the last MCMC iteration. \n NO enriched region is found!\n");
+    Rprintf("Warning: all bins are in the same state at the last MCMC iteration. \n NO enriched region is found!\n");
   }
 
   for(i=0; i<(*nrow); i++){
@@ -414,7 +414,7 @@ void iSeq1(int *burning,int *Size,int *nrow,int *dt,int *countCutoff,double *kap
    chroID: the index used for replace the numberic chromosome with the original chromosome ID
    because character chromosomes are changed to nummeric chromosome for compuation efficiency
 */
-void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *chro,int *gstart,int *gend,
+void binning2(int *chr,int *pos,int *chain,int *len,int *regsize,int *maxtag,int *chro,int *gstart,int *gend,
 	     int *count1,int *count2,int *chroID,int *nregion){
   int i, j;  /* column start from 0 */
 
@@ -432,7 +432,8 @@ void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *chro,int *g
 
   for(i=1; i < (*len); i++){
     if(chr[i] == chro[j]){ /* if the same chromosome */
-      if((pos[i]-gstart[j]) <= (*regsize)){
+      /*      if((pos[i]-gstart[j]) < (*regsize)){ */
+      if(((pos[i]-gstart[j]) < (*regsize)) && (count1[j]<(*maxtag)) && (count2[j]<(*maxtag))){ 
 	gend[j] = pos[i];  /* increase the end position of the region */
 	if(chain[i]==1){
 	  count1[j] += 1;       /* count for positive strand in the region */
@@ -470,7 +471,7 @@ void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *chro,int *g
 
 /* f: foreground signal == IP enriched 
    b: background signal == control samples 
-   input: chrf, posfStart, posfEnd, lenf(length of chrf),
+   input: chrf, posfStart, posfEnd, lenf(length of chrf), count1f (tag counts for chain 1),
           regsize - enriched region size, must equal to the size used in binning function
 	  chrb,posb,chainb,lenb(length of chrb)
    output: countf - IP total count (for chain 1 and 2); coutf is also input
@@ -478,16 +479,24 @@ void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *chro,int *g
            count2b - count for backgroud chain 2 
    the region can be changed. that is, posfEnd can be increased as long as posfEnd[i] <= posfStart[i]+regsize 
 */
-void subBkg(int *chrf,int *posfStart,int *posfEnd,int *lenf,int *regsize, int *chrb,int *posb,int *chainb,
-	    int *lenb,int *countf,int *count1b,int *count2b){
+void subBkg2(int *chrf,int *posfStart,int *posfEnd,int *count1f,int *lenf,int *regsize, int *maxtag,int *chrb,int *posb,
+	    int *chainb,int *lenb,int *countf,int *count1b,int *count2b){
   int i, j,lenfm1,newEnd;
   i = 0;    /* ID for foreground */
   j = 0;    /* ID for background */
   lenfm1 = (*lenf) - 1;
+
+  /* decide the end position for bin i */
+  /* Whenever i is increased, it needs to calculate newEnd */
+  if((count1f[i] == (*maxtag)) || ((countf[i] - count1f[i])==(*maxtag))){
+    newEnd = posfEnd[i];
+  }else{
+    newEnd = posfStart[i]+(*regsize)-1; /* the bin size == regsize, note <= is changed to < in binning function */
+  }
   while(j < (*lenb) && i < (*lenf)){
     /* if posb fall in the IP enriched region */
     if(chrb[j]==chrf[i]){
-      if(posb[j]>=posfStart[i] && posb[j]<=(posfStart[i]+(*regsize))){
+      if(posb[j]>=posfStart[i] && posb[j]<=newEnd){
 	if(posb[j] > posfEnd[i]){
 	  posfEnd[i] = posb[j];
 	}
@@ -499,12 +508,17 @@ void subBkg(int *chrf,int *posfStart,int *posfEnd,int *lenf,int *regsize, int *c
 	}else{
 	  count2b[i] += 1;
 	}
-      }else if(posb[j]>(posfStart[i]+(*regsize)) && i<lenfm1){
-	/* that is, if in the same chr, posb[j] < posfStart[i], do nothing */
+      }else if(posb[j]>newEnd && i<lenfm1){
+	/* that is, if in the same chr,posb[j]<posfStart[i],except j++, do not do anything else */
 	do{
 	  i++;
-	  newEnd = posfStart[i] + (*regsize);
-	  if(posb[j]>=posfStart[i] & posb[j]<= newEnd && chrb[j]==chrf[i]){
+	  if((count1f[i] == (*maxtag)) || ((countf[i] - count1f[i])==(*maxtag))){
+	    newEnd = posfEnd[i];
+	  }else{
+	    newEnd = posfStart[i]+(*regsize)-1; /* the bin size == regsize, note <= is changed to < in binning function */
+	  }
+	  /*	  newEnd = posfStart[i] + (*regsize); */
+	  if(posb[j]>=posfStart[i] && posb[j]<= newEnd && chrb[j]==chrf[i]){
 	    if(posb[j] > posfEnd[i]){
 	      posfEnd[i] = posb[j];
 	    }
@@ -518,11 +532,148 @@ void subBkg(int *chrf,int *posfStart,int *posfEnd,int *lenf,int *regsize, int *c
 	    }
 	  }
 	}while(posb[j]>newEnd && chrb[j]==chrf[i] && i<(*lenf)); 
-      } /*After the do loop chrf[i] = chrb[j] + 1 or posb[j] < posfEnd */
+      } /*After the do loop chrf[i] = chrb[j] + 1 or posb[j] < newEnd, and posb has been count, need to j++ */
+      j++; 
+    }else if(chrb[j-1] != chrb[j]){ /*means chrb[j] > chrf[i] */
+      do{
+	i++;
+	if((count1f[i] == (*maxtag)) || ((countf[i] - count1f[i])==(*maxtag))){
+	  newEnd = posfEnd[i];
+	}else{
+	  newEnd = posfStart[i]+(*regsize)-1; /* the bin size == regsize, note <= is changed to < in binning function */
+	}
+      }while(chrb[j] != chrf[i] &&  i<(*lenf));
+    }else if(chrf[i-1] != chrf[i]){ /* mean chrf[i] > chrb[j]*/
+      do{j++;}while(chrb[j]!=chrf[i] && j<(*lenb));
+    }
+  }
+  /*  Rprintf("\n IProw=%d,CONrow=%d, \n",i,j); */
+}
+
+
+void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *minsize, int *maxtag,int *chro,
+	     int *gstart,int *gend,int *gend2,int *count1,int *count2,int *chroID,int *nregion){
+  int i, j, jSize;  /* column start from 0 */
+
+  /* copy the first row of x and initiate the number of reads to 1 at that point */
+  j = 0;
+  chro[j] = chr[j];
+  chroID[j] = j+1;     /*because R index is from 1:n */
+  gstart[j] = pos[j];      /* region start position */
+  gend[j] = pos[j];  /* actual region end position */
+  gend2[j] = pos[j] + (*regsize)-1;  /* predefined region end position */
+  if(chain[j]==1){       /* count for positive strand in the region */
+    count1[j] = 1;
+  }else{
+    count2[j] = 1;
+  }
+  
+  jSize = *regsize;
+  for(i=1; i < (*len); i++){
+    if(chr[i] == chro[j]){ /* if the same chromosome */
+      if((pos[i]-gstart[j]) < jSize){
+        gend[j] = pos[i];  /* increase the end position of the region */
+        if(chain[i]==1){
+          count1[j] += 1;       /* count for positive strand in the region */
+        }else{
+          count2[j] += 1;   /* count for positive strand in the region */
+        }
+      }else{
+        j = j+1;
+        chro[j] = chr[i];
+        chroID[j] = i+1;
+        gstart[j] = pos[i];
+        gend[j] = pos[i];  /* keep the end position of the region */
+        if(chain[i]==1){
+          count1[j] = 1;
+        }else{
+          count2[j] = 1;
+        }
+	if((count1[j-1]+count2[j-1]) >= (*maxtag)){
+	  if(jSize >= (*minsize)*2){
+	    jSize = jSize/2;
+	  }
+	}else{
+	  if(jSize <= (*regsize/2)){
+	    jSize = 2*jSize;
+	  }
+	}
+	gend2[j] = pos[i] + jSize-1;
+      }
+    }else{
+      j = j+1;
+      chro[j] = chr[i];
+      chroID[j] = i+1;
+      gstart[j] = pos[i];
+      gend[j] = pos[i];  /* keep the end position of the region */
+      if(chain[i]==1){
+        count1[j] = 1;
+      }else{
+        count2[j] = 1;
+      }
+      if((count1[j-1]+count2[j-1]) >= (*maxtag)){
+	if(jSize >= (*minsize)*2){
+	  jSize = (jSize/2);
+	}
+      }else{
+	if(jSize <= (*regsize/2)){
+	  jSize = 2*jSize;
+	}
+      }
+      gend2[j] = pos[i] + jSize-1;
+    }
+  }
+  *nregion = j + 1; /*because R index is from 1:n */
+}
+
+
+void subBkg(int *chrf,int *posfStart,int *posfEnd, int *posfEnd2, int *count1f,int *lenf,int *regsize, int *maxtag,
+	    int *chrb,int *posb,int *chainb,int *lenb,int *countf,int *count1b,int *count2b){
+  int i, j,lenfm1;
+  i = 0;    /* ID for foreground */
+  j = 0;    /* ID for background */
+  lenfm1 = (*lenf) - 1;
+
+  while(j < (*lenb) && i < (*lenf)){
+    /* if posb fall in the IP enriched region */
+    if(chrb[j]==chrf[i]){
+      if(posb[j]>=posfStart[i] && posb[j]<=posfEnd2[i]){
+        if(posb[j] > posfEnd[i]){
+          posfEnd[i] = posb[j];
+        }
+        if(countf[i] > 0){ /*total count truncate at 0 */
+          countf[i] -= 1;
+        }
+        if(chainb[j] == 1){
+          count1b[i] += 1;
+        }else{
+          count2b[i] += 1;
+        }
+      }else if(posb[j]>posfEnd2[i] && i<lenfm1){
+        /* that is, if in the same chr,posb[j]<posfStart[i],except j++, do not do anything else */
+        do{
+          i++;
+          if(posb[j]>=posfStart[i] && posb[j]<= posfEnd2[i] && chrb[j]==chrf[i]){
+            if(posb[j] > posfEnd[i]){
+              posfEnd[i] = posb[j];
+            }
+            if(countf[i] > 0){
+              countf[i] -= 1;
+            }
+            if(chainb[j] == 1){
+              count1b[i] += 1;
+            }else{
+              count2b[i] += 1;
+            }
+          }
+        }while(posb[j]>posfEnd2[i] && chrb[j]==chrf[i] && i<(*lenf));
+      } /*After the do loop chrf[i] = chrb[j] + 1 or posb[j] < newEnd, and posb has been count, need to j++ */
       j++;
-    }else if(chrb[j-1] != chrb[j]){
-      do{i++;}while(chrb[j] != chrf[i] &&  i<(*lenf));
-    }else if(chrf[i-1] != chrf[i]){
+    }else if(chrb[j-1] != chrb[j]){ /*means chrb[j] > chrf[i] */
+      do{
+        i++;
+      }while(chrb[j] != chrf[i] &&  i<(*lenf));
+    }else if(chrf[i-1] != chrf[i]){ /* mean chrf[i] > chrb[j]*/
       do{j++;}while(chrb[j]!=chrf[i] && j<(*lenb));
     }
   }
@@ -539,7 +690,15 @@ void subBkg(int *chrf,int *posfStart,int *posfEnd,int *lenf,int *regsize, int *c
 void mergeReg(int *chr,int *gstart,int *gend,int *count1,int *count2,int *rowID,int *xrow,int *maxgap,
 	      int *ochr,int *ogstart,int *ogend,int *orstart,int *orend,int *opeak,int *changepoint,int *nregion){
  
-  int i,j,cdiff0,cdiff1,maxcount1,maxcount2,maxpos0,maxpos1;
+  int i,j,cdiff0,cdiff1,maxpos1,maxpos2,idist,idistP,idistC,idistN;
+  float maxden1,maxden2,iden1,iden2;
+  int *istart,*iend; /*for keep track of the position of input vectors (eg. gstart, gend) for output region*/
+
+  istart = (int *)R_alloc(*xrow,sizeof(int));
+  iend = (int *)R_alloc(*xrow,sizeof(int));
+  if((istart==NULL) || (iend==NULL)){
+    error("Error: Fail to allocate memory for istart or iend!\n");
+  }
   /* Just copy the data of the first region */
   ochr[0] = chr[0];
   ogstart[0] = gstart[0];
@@ -548,18 +707,24 @@ void mergeReg(int *chr,int *gstart,int *gend,int *count1,int *count2,int *rowID,
   orend[0] = rowID[0];
   opeak[0] = (gstart[0]+gend[0])/2;
   cdiff0 = count1[0] - count2[0];
-  maxcount1 = count1[0];
-  maxcount2 = count2[0];
-  maxpos0 = opeak[0];
+  maxden1 = 1.0*count1[0]/(gend[0]-gstart[0]+1);
+  maxden2 = 1.0*count2[0]/(gend[0]-gstart[0]+1);
   maxpos1 = opeak[0];
+  maxpos2 = opeak[0];
   changepoint[0] = 0;
+  istart[0] = 0;
+  iend[0] = 0;
 
   j = 0;
   for(i=1; i < *xrow; i++){
+    idist = gend[i]-gstart[i]+1;
+    iden1 = 1.0*count1[i]/idist;
+    iden2 = 1.0*count2[i]/idist;
     if(chr[i] == ochr[j]){ /* if the same chromosome */
       if((gstart[i]-ogend[j]) < (*maxgap)){ /*beginning of the next region - the end of current region */
         ogend[j] = gend[i];
         orend[j] = rowID[i];
+	iend[j] = i;
 	cdiff1 = count1[i] - count2[i];
 	/* count the number of change points */
 	if(cdiff0 * cdiff1 <= 0){
@@ -567,16 +732,16 @@ void mergeReg(int *chr,int *gstart,int *gend,int *count1,int *count2,int *rowID,
 	}
 	cdiff0 = cdiff1;
 
-	if(count1[i] > maxcount1){
-	  maxcount1 = count1[i];
-	  maxpos0 = (gstart[i] + gend[i])/2;
-	  opeak[j] = (maxpos0 + maxpos1)/2;
+	if(iden1 >= maxden1){
+	  maxden1 = iden1;
+	  maxpos1 = (gstart[i] + gend[i])/2;
+	  opeak[j] = (maxpos1 + maxpos2)/2; 
 	}
 
-	if(count2[i] > maxcount2){
-	  maxcount2 = count2[i];
-	  maxpos1 = (gstart[i] + gend[i])/2;
-	  opeak[j] = (maxpos0 + maxpos1)/2;
+	if(iden2 > maxden2){
+	  maxden2 = iden2;
+	  maxpos2 = (gstart[i] + gend[i])/2;
+	  opeak[j] = (maxpos1 + maxpos2)/2; 
 	}
       }else {
 	j = j+1;
@@ -586,12 +751,14 @@ void mergeReg(int *chr,int *gstart,int *gend,int *count1,int *count2,int *rowID,
 	orstart[j] = rowID[i];
 	orend[j] = rowID[i];
 	opeak[j] = (gstart[i]+gend[i])/2;
-	maxpos0 = opeak[j];
 	maxpos1 = opeak[j];
-	maxcount1 = count1[i];
-	maxcount2 = count2[i];
+	maxpos2 = opeak[j];
+	maxden1 = iden1;
+	maxden2 = iden2;
 	cdiff0 = count1[i] - count2[i];
 	changepoint[j] = 0;
+	istart[j] = i;
+	iend[j] = i;
       }
     }else{
       j = j+1;    
@@ -601,15 +768,63 @@ void mergeReg(int *chr,int *gstart,int *gend,int *count1,int *count2,int *rowID,
       orstart[j] = rowID[i];
       orend[j] = rowID[i];
       opeak[j] = (gstart[i]+gend[i])/2;
-      maxpos0 = opeak[j];
       maxpos1 = opeak[j];
-      maxcount1 = count1[i];
-      maxcount2 = count2[i];
+      maxpos2 = opeak[j];
+      maxden1 = iden1;
+      maxden2 = iden2;
       cdiff0 = count1[i] - count2[i];
       changepoint[j] = 0;
+      istart[j] = i;
+      iend[j] = i;
     }    
   }
-  *nregion = j + 1; /*because R index is from 1:n */
+
+  *nregion = j;
+  /* recaculate the peak position using moving average approach */ 
+  for(j=0; j<(*nregion+1);j++){
+    if((iend[j]-istart[j])>=3){ /*redefine the peak for the regions with >=4 bins */
+      idistC = gend[istart[j]]-gstart[istart[j]]+1;
+      idistN = gend[istart[j]+1]-gstart[istart[j]+1]+1;
+      maxden1 = (1.0*count1[istart[j]]/idistC + 1.0*count1[istart[j]+1]/idistN)/2.0;
+      maxden2 = (1.0*count2[istart[j]]/idistC + 1.0*count2[istart[j]+1]/idistN)/2.0;
+      maxpos1 = (gstart[istart[j]] + gend[istart[j]])/2;
+      maxpos2 = maxpos1;
+      idistP = idistC;
+      idistC = idistN;
+      for(i=(istart[j]+1); i<iend[j];i++){
+	idistN = gend[i+1]-gstart[i+1]+1;
+	iden1 = (1.0*count1[i-1]/idistP + 1.0*count1[i]/idistC + 1.0*count1[i+1]/idistN)/3.0;
+	iden2 = (1.0*count2[i-1]/idistP + 1.0*count2[i]/idistC + 1.0*count2[i+1]/idistN)/3.0;
+	if(iden1 >= maxden1){
+	  maxden1 = iden1;
+	  maxpos1 = (gstart[i] + gend[i])/2;
+	}
+
+	if(iden2 > maxden2){
+	  maxden2 = iden2;
+	  maxpos2 = (gstart[i] + gend[i])/2;
+	}
+	idistP = idistC;
+	idistC = idistN;
+      }
+      /* now i = iend[j] */
+      iden1 = (1.0*count1[i-1]/idistP + 1.0*count1[i]/idistC)/2.0;
+      iden2 = (1.0*count2[i-1]/idistP + 1.0*count2[i]/idistC)/2.0;
+      if(iden1 >= maxden1){
+	maxden1 = iden1;
+	maxpos1 = (gstart[i] + gend[i])/2;
+      }
+      
+      if(iden2 > maxden2){
+	maxden2 = iden2;
+	maxpos2 = (gstart[i] + gend[i])/2;
+      }
+      opeak[j] = (maxpos1 + maxpos2)/2;
+    }
+  }
+
+  *nregion = *nregion + 1;
+  /* *nregion = j + 1; because R index is from 1:n */
 }
 
 
@@ -671,9 +886,9 @@ R_NativePrimitiveArgType iSeq1Args[19] = {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,REA
 					  REALSXP,REALSXP,REALSXP,INTSXP};
 R_NativePrimitiveArgType mergeRegArgs[16] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,
 					      INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP};
-R_NativePrimitiveArgType subBkgArgs[12] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,
+R_NativePrimitiveArgType subBkgArgs[15] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,
 					INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP};
-R_NativePrimitiveArgType binningArgs[12] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,
+R_NativePrimitiveArgType binningArgs[15] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,
 					    INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP};
 R_NativePrimitiveArgType fdrArgs[5] =  {INTSXP,REALSXP,INTSXP,REALSXP,REALSXP};
 R_NativePrimitiveArgType fillgapArgs[8] =  {INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP,INTSXP};
@@ -682,8 +897,8 @@ static const R_CMethodDef CEntries[] = {
   {"iSeq2", (DL_FUNC)&iSeq2, 16, iSeq2Args},
   {"iSeq1", (DL_FUNC)&iSeq1, 19, iSeq1Args},
   {"mergeReg", (DL_FUNC)&mergeReg,16,mergeRegArgs},
-  {"subBkg", (DL_FUNC)&subBkg,12,subBkgArgs},
-  {"binning", (DL_FUNC)&binning,12,binningArgs},
+  {"subBkg", (DL_FUNC)&subBkg,15,subBkgArgs},
+  {"binning", (DL_FUNC)&binning,15,binningArgs},
   {"fdr", (DL_FUNC)&fdr, 5, fdrArgs},
   {"fillgap",(DL_FUNC)&fillgap,8,fillgapArgs},
   {NULL, NULL, 0}

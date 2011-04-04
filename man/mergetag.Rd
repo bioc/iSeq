@@ -1,13 +1,14 @@
 \name{mergetag}
 \alias{mergetag}
-\title{Aggregate sequence tags into genomic windows/bins and count the number of
+\title{Aggregate sequence tags into dynamic genomic windows/bins and count the number of
   tags in the windows/bins.}
 \description{
-  A function to aggregate sequence tags into genomic windows/bins with certain length
-  specified by the user and count the number of tags falling in the windows/bins.
+  A function to aggregate sequence tags into genomic windows/bins with dynamic length
+  specified by the user and count the number of tags falling in the
+  dynamic windows/bins.
 }
 \usage{
-mergetag(chip,control,winsize=50)
+mergetag(chip,control,maxlen=80,minlen=10,ntagcut=10)
 }
 
 \arguments{
@@ -28,8 +29,18 @@ mergetag(chip,control,winsize=50)
     counts are summarized for chains 1 and 2, respectively (see the below for details). }
   \item{control}{A n by 3 matrix or data frame. The column names of control
     must be the same as the column names of chip.}
-  \item{winsize}{The window size for the genomic window/bin into which
+  \item{maxlen}{The maximum length of the genomic window/bin into which
     sequence tags are aggregated.}
+  \item{minlen}{The minimum length of the genomic window/bin into
+    which sequence tags are aggregated.}
+  \item{ntagcut}{The tag count cutoff value for triggering bin size change. For
+    example, suppose L_i and C_i are the length and tag count
+    for bin i, respectively.  If C_i >= ntagcut, the length for bin
+    i+1 will be min(L_i/2,minlen); if C_i < ntagcut, the length for bin
+    i+1 will be max(2*L_i, maxlen).  Note, by default, the bin sizes
+    decrease/increase by a factor of 2.  Thus, the user should let
+    maxlen = (2^n)*minlen.  
+  } 
 }
 
 \seealso{
@@ -54,8 +65,7 @@ data(nrsf)
 chip = rbind(nrsf$chipFC1592,nrsf$chipFC1862,nrsf$chipFC2002)
 mock = rbind(nrsf$mockFC1592,nrsf$mockFC1862,nrsf$mockFC2002)
 
-tagct = mergetag(chip=chip,control=mock,winsize=50)
-
+tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=10)
 }
 
 \author{Qianxing Mo \email{moq@mskcc.org}}

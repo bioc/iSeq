@@ -36,8 +36,7 @@ peakreg(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   \item{method}{'ppcut' or 'fdrcut'.}
   \item{maxgap}{The criterion used to merge enriched bins.  If the
     genomic distance of adjacent bins is less than maxgap, the bins will
-    be merged into the same enriched region. 
-  }
+    be merged into the same enriched region.}
 }
 \seealso{
   \code{\link{iSeq1}}, \code{\link{iSeq2}}, \code{\link{mergetag}},\code{\link{plotreg}}
@@ -51,13 +50,6 @@ peakreg(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   \item{rstart}{The row number for gstart in chrpos.}
   \item{rend}{The row number for gend in chrpos.}
   \item{peakpos}{The inferred center (peak) of the enriched region.}
-  \item{cp}{The number of change points in the merged enriched
-    region. A change point is a genomic position where the signs of the
-    net tag counts of the the neighboring bins change.  For each bin, the
-    net tag counts = tag counts of chain 1 - tag counts of chain 2. For
-    example, if the signs of the net tag counts for two neighboring bins
-    are +  - (or, -  +), then we say there is a change point. A typical
-    enriched region has one change point.}
   \item{meanpp}{The mean posterior probability of the merged
     regions/bins.}
   \item{ct1}{total tag counts for the region from gstart to gend for the
@@ -65,6 +57,16 @@ peakreg(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   \item{ct2}{total tag counts for the region from gstart to gend for the
     chain corresponding to count[,1]; ct2=sum(count[rstart:rend,2])}
   \item{ct12}{ct12 = ct1 + ct2}
+  \item{sym}{A parameter used to measure if the forward and reverse tag
+    counts are symmetrical (or balanced) in enriched regions. The values
+    range from 0.5 (perfect symmetry) to 0 (complete asymmetry).}
+%  \item{cp}{The number of change points in the merged enriched
+%    region. A change point is a genomic position where the signs of
+%    the net tag counts of the the neighboring bins change.  For each
+%    bin, the net tag counts = tag counts of chain 1 - tag counts of
+%    chain 2. For example, if the signs of the net tag counts for two
+%    neighboring bins are +  - (or, -  +), then we say there is a
+%    change point. A typical enriched region has one change point.}
 }
 
 \examples{
@@ -72,16 +74,16 @@ peakreg(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
 data(nrsf)
 chip = rbind(nrsf$chipFC1592,nrsf$chipFC1862,nrsf$chipFC2002)
 mock = rbind(nrsf$mockFC1592,nrsf$mockFC1862,nrsf$mockFC2002)
-tagct = mergetag(chip=chip,control=mock,winsize=50)
+tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=20)
 tagct22 = tagct[tagct[,1]=="chr22",]
-res1 = iSeq1(Y=tagct22[,1:4],gap=300,burnin=200,sampling=500,ctcut=3,a0=1,b0=1,
+res1 = iSeq1(Y=tagct22[,1:4],gap=200,burnin=200,sampling=500,ctcut=0.95,a0=1,b0=1,
  a1=5,b1=1, k0=3,mink=0,maxk=10,normsd=0.1,verbose=FALSE)
 
 reg1 = peakreg(tagct22[,1:3],tagct22[,5:6]-tagct22[,7:8],res1$pp,0.5,
-        method="ppcut",maxgap=300)
+        method="ppcut",maxgap=200)
 
 reg2 = peakreg(tagct22[,1:3],tagct22[,5:6]-tagct22[,7:8],res1$pp,0.05,
-         method="fdrcut",maxgap=300)
+         method="fdrcut",maxgap=200)
 }
 
 \author{Qianxing Mo \email{moq@mskcc.org}}
