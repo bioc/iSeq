@@ -217,8 +217,7 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   countR = apply(y,1,countFun,ct=count[,2])
   countFR = countF + countR
   symtry = round(pmin(countF,countR)/countFR,2)
-#  regsize = y[,3]-y[,2]+1
-#  br = data.frame(y,meanpp=mpp,countF=countF,countR=countR,countFR=countFR,regsize=regsize)
+  symtry[countFR <= 0] = 0
   br = data.frame(y,meanpp=mpp,ct1=countF,ct2=countR,ct12=countFR,sym=symtry)
   br[,1] = chrpos[br[,4],1] #use the original chromosome label
   return(br)

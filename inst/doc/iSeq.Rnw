@@ -37,14 +37,14 @@ Memorial Sloan-Kettering Cancer Center\\
 
 This package implements the models proposed by Mo (2010) for ChIP-seq data analysis, 
 which are the extensions of the models proposed for ChIP-chip data (Mo and Liang, 2010a,b).  
-The package can be used to analyze the ChIP-seq data with or without controls. \\
+The package can be used to analyze ChIP-seq data with or without controls. \\
 
 \noindent
 This package processes ChIP-seq data in three steps. \\
 \begin{itemize}
 \item {Build a dynamic signal profile for each chromosome.  To create a dynamic signal profile, 
     sequence tags are aggregated into non-overlapping dynamic bins whose lengths vary according to 
-    the tag density (See the help file of function 'mergetag').  The number of tags falling in each bin is counted.
+    local tag density (See the help file of function 'mergetag').  The number of tags falling in each bin is counted.
     A dynamic signal profile is made of the bin-based tag counts and the corresponding genomic positions on 
     the chromosome.  The bins and their tag counts are ordered along the chromosome according to 
     their genomic positions. }
@@ -85,7 +85,7 @@ the following.
 
 \section{Example --- Analyze the NRSF Data}
 \noindent
-Firstly, let's load the library and check the data.  There are three ChIP and control samples, respectively. 
+First, let's load the library and check the data.  There are three ChIP and control samples, respectively. 
 <<echo=TRUE,print=FALSE>>=
 library(iSeq)
 data(nrsf)
@@ -101,7 +101,7 @@ print(chip[1:3,])
 print(mock[1:3,])
 @ 
 \noindent
-We suggest building the signal profiles using dynamic bins (80, 40, 20, 10 bp) and the threshold of 10 tags 
+We suggest building the signal profiles using dynamic bins (80, 40, 20, 10 bp) and 10 tags as the threshold  
 for triggering bin size change for the NRSF data,  which is equivalent to setting maxlen=80,minlen=10 and 
 ntagcut=10 for the arguments of function 'megertag'.  Of course, the user can use other settings 
 according to the sequencing depth of the experiments.
@@ -146,7 +146,7 @@ print(reg0[1:5,]) # Top five regions
 \noindent 
 Function iSeq1 implements a fully Bayesian hidden Ising model in which the latent variable $X$ is modeled by 
 the standard 1D Ising model.  The columns 1-4 of tagct are the signal profiles for modeling.  
-Note that the column 4 is the adjusted tag counts of the ChIP samples. For one sample analysis, 
+Note that the column 4 contains the adjusted tag counts of the ChIP samples. For one sample analysis, 
 it is the total tag counts for the forward and reverse chains. 
 <<echo=TRUE,print=FALSE>>=
 set.seed(777)
@@ -240,7 +240,7 @@ res2 = iSeq2(Y=tagct22[,1:4],gap=200, burnin=100,sampling=500,winsize=2,ctcut=0.
 
 \noindent 
 Plot the model parameters to see whether they converge.  If the chains do not mix well, one can adjust 
-the parameter {\bf k} and/or normsd to see how it affects the results. 
+the parameter {\bf k} and/or normsd to see how they affect the results. 
 \begin{center}
 <<fig=TRUE,echo=TRUE>>=
 par(mfrow=c(2,2), mar=c(4.1, 4.1, 2.0, 1.0))
