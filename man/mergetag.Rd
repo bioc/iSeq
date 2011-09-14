@@ -72,9 +72,9 @@ tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=10)
 
 \references{
 
-  Qianxing Mo (2010). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. (submitted).
-  
+  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics}, Advance Access published September 13,
+  2011. doi:10.1093/biostatistics/kxr029
 }
 \keyword{models}
 

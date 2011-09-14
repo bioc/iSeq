@@ -305,7 +305,7 @@ plotreg = function(gpos,ipct,conct,peak,col=c("yellow","green","grey0","blue")){
     ymax = max(ipct[,1])
   }
   nreg = nrow(gpos)
-  plot(c(xmin,xmax),c(ymin,ymax),type="n",xlab="Genomic Gposition",ylab="Counts")
+  plot(c(xmin,xmax),c(ymin,ymax),type="n",xlab="Genomic position",ylab="Count")
   rect(gpos[,1],rep(0,nreg),gpos[,2],ipct[,1],col=col[1],border=TRUE)
   rect(gpos[,1],rep(0,nreg),gpos[,2],-ipct[,2],col=col[2],border=TRUE)
   if(!missing(conct)){

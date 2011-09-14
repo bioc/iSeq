@@ -83,8 +83,11 @@ iSeq1(Y,gap=300,burnin=500,sampling=2000,ctcut=0.95,a0=1,b0=1,a1=5,b1=1,
 \author{Qianxing Mo \email{moq@mskcc.org}}
 
 \references{
-  Qianxing Mo (2010). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. (submitted).
+  
+  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics}, Advance Access published September 13,
+  2011. doi:10.1093/biostatistics/kxr029
+  
 }
 \keyword{models}
 

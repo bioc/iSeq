@@ -40,10 +40,11 @@ plotreg(gpos,ipct,conct,peak,col=c("yellow","green","grey0","blue"))
 \author{Qianxing Mo \email{moq@mskcc.org}}
 
 \references{
-
-  Qianxing Mo  (2010).  A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. (submitted). 
-  
+   
+  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics}, Advance Access published September 13,
+  2011. doi:10.1093/biostatistics/kxr029
+   
 }
 \keyword{models}
 
