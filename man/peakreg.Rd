@@ -86,13 +86,12 @@ reg2 = peakreg(tagct22[,1:3],tagct22[,5:6]-tagct22[,7:8],res1$pp,0.05,
          method="fdrcut",maxgap=200)
 }
 
-\author{Qianxing Mo \email{moq@mskcc.org}}
+\author{Qianxing Mo \email{qmo@bcm.edu}}
 
 \references{
 
-  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. \emph{Biostatistics}, Advance Access published September 13,
-  2011. doi:10.1093/biostatistics/kxr029
+  Qianxing Mo. (2012). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics} 13(1), 113-28.
   
   Newton, M., Noueiry, A., Sarkar, D., Ahlquist, P. (2004). Detecting
   differential gene expression with a semiparametric hierarchical mixture method.

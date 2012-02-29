@@ -68,13 +68,12 @@ mock = rbind(nrsf$mockFC1592,nrsf$mockFC1862,nrsf$mockFC2002)
 tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=10)
 }
 
-\author{Qianxing Mo \email{moq@mskcc.org}}
+\author{Qianxing Mo \email{qmo@bcm.edu}}
 
 \references{
 
-  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. \emph{Biostatistics}, Advance Access published September 13,
-  2011. doi:10.1093/biostatistics/kxr029
+  Qianxing Mo. (2012). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics} 13(1), 113-28.
 }
 \keyword{models}
 

@@ -25,9 +25,10 @@
 \maketitle
 
 \begin{center}
-Department of Epidemiology and Biostatistics\\
-Memorial Sloan-Kettering Cancer Center\\
-{\tt moq@mskcc.org}
+Division of Biostatistics\\
+Dan L. Duncan Cancer Center\\
+Baylor College of Medicine\\
+{\tt qmo@bcm.edu}
 \end{center}
 
 \tableofcontents
@@ -351,8 +352,8 @@ A hidden Ising model for ChIP-chip data analysis.
 {\it Bioinformatics} {\bf 26(6)}, 777-783.
 
 \bibitem[\protect\citeauthoryear{Mo}{2011}]{mo2011}
-Mo, Q. (2011). A fully Bayesian hidden Ising model for ChIP-seq data analysis. 
-{\it Biostatistics}, Advance Access published September 13, 2011. doi:10.1093/biostatistics/kxr029
+Mo, Q. (2012). A fully Bayesian hidden Ising model for ChIP-seq data analysis. 
+{\it Biostatistics} {\bf 13(1)}, 113-28.
 
 \bibitem[\protect\citeauthoryear{Newton et al.}{2004}]{new04}
 Newton, M., Noueiry, A., Sarkar, D., Ahlquist, P. (2004). Detecting differential gene expression with a semiparametric

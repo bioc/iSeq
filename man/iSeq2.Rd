@@ -71,15 +71,14 @@ res2 = iSeq2(Y=tagct22[,1:4],gap=200, burnin=100,sampling=500,winsize=2,ctcut=0.
 
 }
 
-\author{Qianxing Mo \email{moq@mskcc.org}}
+\author{Qianxing Mo \email{qmo@bcm.edu}}
 
 \references{
   Qianxing Mo, Faming Liang.  (2010). Bayesian modeling of ChIP-chip data through
-  a high-order Ising model. \emph{Biometrics}, 66(4), 1284-94.
+  a high-order Ising model. \emph{Biometrics} 66(4), 1284-94.
 
-  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis.  \emph{Biostatistics}, Advance Access published September 13,
-  2011. doi:10.1093/biostatistics/kxr029
+  Qianxing Mo. (2012). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis.  \emph{Biostatistics} 13(1), 113-28.
 }
 \keyword{models}
 

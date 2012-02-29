@@ -80,13 +80,12 @@ iSeq1(Y,gap=300,burnin=500,sampling=2000,ctcut=0.95,a0=1,b0=1,a1=5,b1=1,
  plotreg(tagct22[ID,2:3],tagct22[ID,5:6],tagct22[ID,7:8],peak=reg1[1,6])
 }
 
-\author{Qianxing Mo \email{moq@mskcc.org}}
+\author{Qianxing Mo \email{qmo@bcm.edu}}
 
 \references{
   
-  Qianxing Mo (2011). A fully Bayesian hidden Ising model for ChIP-seq
-  data analysis. \emph{Biostatistics}, Advance Access published September 13,
-  2011. doi:10.1093/biostatistics/kxr029
+  Qianxing Mo. (2012). A fully Bayesian hidden Ising model for ChIP-seq
+  data analysis. \emph{Biostatistics} 13(1), 113-28.
   
 }
 \keyword{models}
