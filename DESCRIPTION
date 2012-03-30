@@ -1,6 +1,6 @@
 Package: iSeq
 Title: Bayesian Hierarchical Modeling of ChIP-seq Data Through Hidden Ising Models
-Version: 1.7.2
+Version: 1.8.0
 Date: 2012-2-19
 Depends: R (>= 2.10.0)
 Author: Qianxing Mo
