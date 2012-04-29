@@ -8,4 +8,4 @@ Maintainer: Qianxing Mo  <qmo@bcm.edu>
 Description: This package uses Bayesian hidden Ising models to identify IP-enriched genomic regions from ChIP-seq data. It can be used to analyze ChIP-seq data with or without controls. 
 LazyData: yes
 License: GPL (>= 2)
-biocViews: ChIP-seq, next generation sequencing, massively parallel sequencing, bioinformatics
+biocViews: ChIPseq, HighThroughputSequencing, Bioinformatics
