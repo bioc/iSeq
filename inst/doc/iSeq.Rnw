@@ -350,7 +350,7 @@ res=sfLapply(dataList,iSeq1,gap=200,burnin=100,sampling=200,ctcut=0.95,a0=1,b0=1
 \noindent 
 An R script called 'iSeq.R' has implemented the above parallel computation
 strategy and can be used as a command line program
-in Unix/Linux environment, which is available at \\
+in Unix/Linux environment to automate ChIP-seq data analysis, which is available at \\
 \url{https://sites.google.com/site/quincymobio/teaching-materials}. 
 
 \section{Citing iSeq}
@@ -372,7 +372,7 @@ Mo, Q., Liang, F. (2010b).
 A hidden Ising model for ChIP-chip data analysis.  
 {\it Bioinformatics} {\bf 26(6)}, 777-783.
 
-\bibitem[\protect\citeauthoryear{Mo}{2011}]{mo2011}
+\bibitem[\protect\citeauthoryear{Mo}{2011}]{mo20112}
 Mo, Q. (2012). A fully Bayesian hidden Ising model for ChIP-seq data analysis. 
 {\it Biostatistics} {\bf 13(1)}, 113-28.
 
