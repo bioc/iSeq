@@ -1,11 +1,11 @@
 Package: iSeq
 Title: Bayesian Hierarchical Modeling of ChIP-seq Data Through Hidden Ising Models
-Version: 1.9.0
-Date: 2012-2-19
+Version: 1.9.1
+Date: 2012-9-26
 Depends: R (>= 2.10.0)
 Author: Qianxing Mo
 Maintainer: Qianxing Mo  <qmo@bcm.edu>
-Description: This package uses Bayesian hidden Ising models to identify IP-enriched genomic regions from ChIP-seq data. It can be used to analyze ChIP-seq data with or without controls. 
+Description: This package uses Bayesian hidden Ising models to identify IP-enriched genomic regions from ChIP-seq data. It can be used to analyze ChIP-seq data with and without controls and replicates. 
 LazyData: yes
 License: GPL (>= 2)
 biocViews: ChIPseq, HighThroughputSequencing, Bioinformatics

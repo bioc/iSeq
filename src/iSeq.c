@@ -1,7 +1,7 @@
 /* Codes used for Hidden Ising modeling of ChIP-seq data */
 /* Coding start date: 2/18/2010.  Complete the package on Sept. 14, 2010 */
-/* Qianxing Mo (moq@mskcc.org),
-   Department of Epidemiology and Biostatistics, Memorial Sloan-Kettering Cancer Center */
+/* Qianxing Mo (qmo@bcm.edu),
+   Division of Biostatistics, Dan L. Duncan Cancer Center, Baylor College of Medicine */
 /*
 #include <stdlib.h>
 #include <stdio.h>
@@ -626,7 +626,7 @@ void binning(int *chr,int *pos,int *chain,int *len,int *regsize,int *minsize, in
   *nregion = j + 1; /*because R index is from 1:n */
 }
 
-
+/* This function is used in mergetag function. Note added on 09/25/2012 */
 void subBkg(int *chrf,int *posfStart,int *posfEnd, int *posfEnd2, int *count1f,int *lenf,int *regsize, int *maxtag,
 	    int *chrb,int *posb,int *chainb,int *lenb,int *countf,int *count1b,int *count2b){
   int i, j,lenfm1;

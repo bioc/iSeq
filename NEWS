@@ -1,0 +1,9 @@
+version 1.9.0
+
+  o Previously, peakreg fails when only one posterior probability is greater than ppcut or fdrcut, although this condition is really rare.  This bug has been fixed.  
+
+  o A tutorial of ChIP-seq data analysis using iSeq and an R script called iSeq.R that can be used as a command line program have been posted at 
+https://sites.google.com/site/quincymobio/teaching-materials
+
+  o The document for iSeq has been updated.
+

@@ -1,7 +1,7 @@
-## The latest R functions for iChip software
-# Quincy Mo, moq@mskcc.org
-# Department of Epidemiology and Biostatistics,Memorial Sloan-Kettering Cancer center
-# New York, NY 10065
+# The latest R functions for iSeq software
+# Quincy Mo, qmo@bcm.edu
+# Division of Biostatistics, Dan L. Duncan Cancer Center, Baylor College of Medicine
+# Houston, TX 77030
 
 # high-order Ising model for ChIP-chip data
 ## Y[,1] = chromosome,Y[,2]=start position of the bin, Y[,3]=end position of the bin,
@@ -155,8 +155,9 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   type = match.arg(method)
   ppcut = FALSE
   fdrcut = FALSE
-  if(type == "ppcut"){ppcut = TRUE}
-  else if(type == "fdrcut"){fdrcut = TRUE}
+  if(type == "ppcut"){
+    ppcut = TRUE
+  }else if(type == "fdrcut"){fdrcut = TRUE}
   
   chrf = as.factor(chrpos[,1])
   chrn = as.integer(chrf)
@@ -185,7 +186,8 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   xlen = nrow(x) #length
   ######### chrom start end countF coutR row.s row.e #############
   if(xlen == 1){
-    br = cbind(x[,1:3],x[,6],x[,6],floor((x[,2]+x[,3])/2),round(pp[id],2),count[id,],sum(count[id,]),round(min(count[id,])/sum(count[id,]),2))
+    midpos = floor((as.integer(x[,2]) + as.integer(x[,3]))/2)
+    br = cbind(x[,1:3],x[,6],x[,6],midpos,round(pp[id],2),count[id,],sum(count[id,]),round(min(count[id,])/sum(count[id,]),2))
     colnames(br) = c("chr","gstart","gend","rstart","rend","peakpos","meanpp","ct1","ct2","ct12","sym")
     br = as.data.frame(br)
     br[1,1] = chrpos[br[1,4],1] #use the original chromosome label
@@ -220,6 +222,7 @@ peakreg = function(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   symtry[countFR <= 0] = 0
   br = data.frame(y,meanpp=mpp,ct1=countF,ct2=countR,ct12=countFR,sym=symtry)
   br[,1] = chrpos[br[,4],1] #use the original chromosome label
+  colnames(br) = c("chr","gstart","gend","rstart","rend","peakpos","meanpp","ct1","ct2","ct12","sym")	
   return(br)
 }
 
@@ -254,7 +257,7 @@ mergetag = function(chip,control,maxlen=80,minlen=10,ntagcut=10){
     as.integer(maxlen),as.integer(minlen),as.integer(ntagcut),chro=chr,gstart=chr,gend=chr,gend2=chr,
     count1=chr,count2=chr,chroID=chr,nregion=as.integer(0),PACKAGE="iSeq")
   Y = data.frame(gstart=res$gstart,gend=res$gend,ct12=(res$count1+res$count2),
-    ct1=res$count1,ct2=res$count2,gend2=res$gend2)[1:res$nregion,]
+    ipct1=res$count1,ipct2=res$count2,gend2=res$gend2)[1:res$nregion,]
   Y = data.frame(chr=IP[res$chroID[1:res$nregion],1],Y)
 
   if(!(missing(control))){

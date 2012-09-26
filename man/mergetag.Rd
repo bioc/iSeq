@@ -50,7 +50,8 @@ mergetag(chip,control,maxlen=80,minlen=10,ntagcut=10)
   A data frame with rows corresponding to the bins and columns corresponding to the following: 
   \item{chr}{Chromosome IDs.}
   \item{gstart}{The start position of the bin.}
-  \item{gend}{The end position of the bin.}
+  \item{gend}{The position of the last read/tag falling in the bin.}
+  \item{gend2}{The end position of the bin (gend2 only shows in the output when argument control is missing).}
   \item{ct12}{For one-sample analysis, where only the ChIP data are
     available, ct12 = ipct1 + ipct2. For two-sample analysis, where both the ChIP
     and control data are available.  ct12 = maximum(ipct1+ipct2-conct1-conct2,0).}
