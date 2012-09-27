@@ -55,7 +55,7 @@ peakreg(chrpos,count,pp,cutoff,method=c("ppcut","fdrcut"),maxgap=300)
   \item{ct1}{total tag counts for the region from gstart to gend for the
     chain corresponding to count[,1]; ct1=sum(count[rstart:rend,1])}
   \item{ct2}{total tag counts for the region from gstart to gend for the
-    chain corresponding to count[,1]; ct2=sum(count[rstart:rend,2])}
+    chain corresponding to count[,2]; ct2=sum(count[rstart:rend,2])}
   \item{ct12}{ct12 = ct1 + ct2}
   \item{sym}{A parameter used to measure if the forward and reverse tag
     counts are symmetrical (or balanced) in enriched regions. The values
