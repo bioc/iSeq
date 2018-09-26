@@ -1,7 +1,6 @@
 # The latest R functions for iSeq software
-# Quincy Mo, qmo@bcm.edu
-# Division of Biostatistics, Dan L. Duncan Cancer Center, Baylor College of Medicine
-# Houston, TX 77030
+# Quincy Mo, qianxing.mo@moffitt.org
+# H. Lee Moffitt Cancer Center & Research Institute
 
 # high-order Ising model for ChIP-chip data
 ## Y[,1] = chromosome,Y[,2]=start position of the bin, Y[,3]=end position of the bin,
@@ -319,27 +318,4 @@ plotreg = function(gpos,ipct,conct,peak,col=c("yellow","green","grey0","blue")){
     abline(v=peak,lty=2,lwd=2)
   }
   abline(h=0,lwd=2)
-}
-
-## binobj is the object returned by binning function
-# control[,1] -- chromosome, control[,2] - genomic position, control[,3] chain indicator
-# control must be sorted, firstly by chromosome and then by genomic position
-subcon = function(binobj,control){
-  IPchr = as.factor(binobj$reg[,1])
-  CONchr = as.factor(control[,1])
-  CONchain = as.numeric(as.factor(control[,3]))
-  if(length(attributes(IPchr)$levels) != length(attributes(CONchr)$levels)){
-    message("Error: binobj$reg[,1] and control[,1] have different numbers/types of chromosomes!\n")
-    stop("The numbers/types of chromosomes in binobj and control must be the same.\n")
-  }
-  IPchr = as.integer(as.numeric(IPchr))
-  CONchr = as.integer(as.numeric(CONchr))
-  IProw = nrow(binobj$reg)
-  CONrow = nrow(control)
-  res = .C("subBkg",IPchr,as.integer(binobj$reg[,2]),IPend=as.integer(binobj$reg[,3]),
-    as.integer(IProw),as.integer(binobj$maxlen),CONchr,as.integer(control[,2]),as.integer(CONchain),
-    as.integer(CONrow),countIP=as.integer(binobj$reg[,4]+binobj$reg[,5]),countFCON=as.integer(rep(0,IProw)),
-    countRCON=as.integer(rep(0,IProw)),PACKAGE="iSeq")
-  data.frame(chr=binobj$reg[,1],gstart=binobj$reg[,2],gend=res$IPend,adjct=res$countIP,
-             confct=res$countFCON,conrct=res$countRCON)
 }

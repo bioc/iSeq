@@ -1,7 +1,6 @@
 /* Codes used for Hidden Ising modeling of ChIP-seq data */
 /* Coding start date: 2/18/2010.  Complete the package on Sept. 14, 2010 */
-/* Qianxing Mo (qmo@bcm.edu),
-   Division of Biostatistics, Dan L. Duncan Cancer Center, Baylor College of Medicine */
+/* Qianxing Mo (qianxing.mo@moffitt.org) */
 /*
 #include <stdlib.h>
 #include <stdio.h>
@@ -205,7 +204,7 @@ void iSeq1(int *burning,int *Size,int *nrow,int *dt,int *countCutoff,double *kap
 	   double *maxKappa,double *ransd,double *postX,int *X,double *postKappa,double *alpha0,double *beta0,
 	   double *alpha1,double *beta1,double *lambda0,double *lambda1,int *verbose){
 
-  int sampleSize,i,j,r,n0,n1,state,nrowm1,sumxx;
+  int sampleSize,i,r,n0,n1,state,nrowm1,sumxx;
   double p,s0,s1,kappa,newKappa,ratio;
 
   sampleSize = (*burning) + (*Size);

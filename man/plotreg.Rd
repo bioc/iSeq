@@ -37,7 +37,7 @@ plotreg(gpos,ipct,conct,peak,col=c("yellow","green","grey0","blue"))
 
 }
 
-\author{Qianxing Mo \email{qmo@bcm.org}}
+\author{Qianxing Mo \email{qianxing.mo@moffitt.org}}
 
 \references{
    

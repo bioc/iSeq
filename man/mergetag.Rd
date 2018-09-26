@@ -69,7 +69,7 @@ mock = rbind(nrsf$mockFC1592,nrsf$mockFC1862,nrsf$mockFC2002)
 tagct = mergetag(chip=chip,control=mock,maxlen=80,minlen=10,ntagcut=10)
 }
 
-\author{Qianxing Mo \email{qmo@bcm.edu}}
+\author{Qianxing Mo \email{qianxing.mo@moffitt.org}}
 
 \references{
 

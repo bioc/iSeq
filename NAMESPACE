@@ -1,2 +1,4 @@
 useDynLib(iSeq)
+importFrom("graphics", "abline", "plot", "rect")
+importFrom("stats", "quantile")
 export(iSeq1,iSeq2,peakreg,mergetag,plotreg)

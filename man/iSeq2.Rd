@@ -71,7 +71,7 @@ res2 = iSeq2(Y=tagct22[,1:4],gap=200, burnin=100,sampling=500,winsize=2,ctcut=0.
 
 }
 
-\author{Qianxing Mo \email{qmo@bcm.edu}}
+\author{Qianxing Mo \email{qianxing.mo@moffitt.org}}
 
 \references{
   Qianxing Mo, Faming Liang.  (2010). Bayesian modeling of ChIP-chip data through
